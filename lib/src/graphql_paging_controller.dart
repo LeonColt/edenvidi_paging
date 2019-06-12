@@ -45,15 +45,15 @@ class GraphQLPagingController<T> extends PagingController<T> {
 			else {
 				final ListWithPageInfo<T> data = transformer( result.data as Map<String, dynamic> );
 				if ( data.list.isNotEmpty ) {
-					page = data.page_info.page + ( data.list.length >= items_per_page ? 1 : 0 );
-					max_page = data.page_info.total_pages;
+					page = data.meta.page + ( data.list.length >= items_per_page ? 1 : 0 );
+					max_page = data.meta.total_pages;
 					final new_data = _paging_subject.value;
 					new_data[page] = data.list;
 					_paging_subject.add(new_data);
 				}
 				else {
-					page = data.page_info.page;
-					max_page = data.page_info.total_pages;
+					page = data.meta.page;
+					max_page = data.meta.total_pages;
 				}
 			}
 		} catch (error) {
@@ -78,8 +78,8 @@ class GraphQLPagingController<T> extends PagingController<T> {
 			else {
 				page = 1;
 				final ListWithPageInfo<T> data = transformer( result.data as Map<String, dynamic> );
-				page = data.page_info.page + ( data.list.length >= items_per_page ? 1 : 0 );
-				max_page = data.page_info.total_pages;
+				page = data.meta.page + ( data.list.length >= items_per_page ? 1 : 0 );
+				max_page = data.meta.total_pages;
 				_paging_subject.add({
 					page: data.list,
 				});

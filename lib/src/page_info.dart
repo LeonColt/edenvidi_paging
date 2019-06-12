@@ -34,10 +34,10 @@ class PageInfo {
 
 class ListWithPageInfo<T> {
 	@JsonKey(required: true, nullable: false, disallowNullValue: true)
-	PageInfo page_info;
+	PageInfo meta;
 	
 	@JsonKey(required: true, nullable: false, disallowNullValue: true)
 	List<T> list;
 	
-	ListWithPageInfo(this.page_info, this.list);
+	ListWithPageInfo(this.meta, this.list);
 }

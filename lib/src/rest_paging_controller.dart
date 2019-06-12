@@ -27,14 +27,14 @@ class RestPagingController<T> extends PagingController<T> {
 		try {
 			final ListWithPageInfo<T> data = await onRequestPage( new ArgPageInfo(page: page, per_page: items_per_page) );
 			if( data.list.isNotEmpty ) {
-				page = data.page_info.page + ( data.list.length >= items_per_page ? 1 : 0 );
-				max_page = data.page_info.total_pages;
+				page = data.meta.page + ( data.list.length >= items_per_page ? 1 : 0 );
+				max_page = data.meta.total_pages;
 				final new_data = _paging_subject.value;
 				new_data[page] = data.list;
 				_paging_subject.add(new_data);
 			} else if( page == 0 && max_page == 1 ) {
-				page = data.page_info.page;
-				max_page = data.page_info.total_pages;
+				page = data.meta.page;
+				max_page = data.meta.total_pages;
 			}
 			if ( page < max_page ) page++;
 		} catch (error) {
@@ -50,8 +50,8 @@ class RestPagingController<T> extends PagingController<T> {
 		try {
 			page = 1;
 			final ListWithPageInfo<T> data = await onRequestPage( new ArgPageInfo(page: page, per_page: items_per_page) );
-			page = data.page_info.page + ( data.list.length >= items_per_page ? 1 : 0 );
-			max_page = data.page_info.total_pages;
+			page = data.meta.page + ( data.list.length >= items_per_page ? 1 : 0 );
+			max_page = data.meta.total_pages;
 			_paging_subject.add({
 				page: data.list,
 			});
