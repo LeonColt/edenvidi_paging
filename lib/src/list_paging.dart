@@ -4,7 +4,7 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'definitions.dart';
 import 'paging_controller.dart';
 
-class RestListPaging<T> extends StatefulWidget {
+class ListPaging<T> extends StatefulWidget {
 	final ItemBuilder<T> itemBuilder;
 	final PagingController<T> controller;
 	final Widget skeleton;
@@ -16,7 +16,7 @@ class RestListPaging<T> extends StatefulWidget {
 	final bool allow_refresh;
 	final bool allow_load_more;
 	final OnError onError;
-	const RestListPaging({
+	const ListPaging({
 		Key key,
 		@required this.controller,
 		@required this.itemBuilder,
@@ -32,10 +32,10 @@ class RestListPaging<T> extends StatefulWidget {
 	}) : assert( controller != null ), assert( itemBuilder != null ), super(key: key);
 	
 	@override
-	State<StatefulWidget> createState() => _RestListPagingState<T>();
+	State<StatefulWidget> createState() => _ListPagingState<T>();
 }
 
-class _RestListPagingState<T> extends State<RestListPaging<T>> {
+class _ListPagingState<T> extends State<ListPaging<T>> {
 	GlobalKey<EasyRefreshState> _refresh_state = GlobalKey<EasyRefreshState>();
 	@override
 	Widget build(BuildContext context) => new StreamBuilder<List<T>>(
@@ -95,7 +95,7 @@ class _RestListPagingState<T> extends State<RestListPaging<T>> {
 	}
 	
 	@override
-	void didUpdateWidget(RestListPaging<T> oldWidget) {
+	void didUpdateWidget(ListPaging<T> oldWidget) {
 		super.didUpdateWidget(oldWidget);
 		if ( widget.controller != oldWidget.controller ) {
 			new Future.delayed(Duration.zero, () {
