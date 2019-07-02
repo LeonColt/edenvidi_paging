@@ -4,23 +4,28 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'definitions.dart';
 import 'paging_controller.dart';
 
-class ListPaging<T> extends StatefulWidget {
+class GridPaging<T> extends StatefulWidget {
 	final ItemBuilder<T> itemBuilder;
 	final PagingController<T> controller;
 	final Widget skeleton;
 	final Widget empty_widget;
 	final double item_extend;
 	final EdgeInsets padding;
+	final ScrollController scroll_controller;
 	final ScrollController outer_scroll_controller;
 	final Map<int, Widget> items_extension;
 	final bool allow_refresh;
 	final bool allow_load_more;
 	final OnError onError;
-	const ListPaging({
+	final SliverGridDelegate grid_delegate;
+	final bool shrink_wrap;
+	const GridPaging({
 		Key key,
 		@required this.controller,
 		@required this.itemBuilder,
 		@required this.onError,
+		@required this.grid_delegate,
+		this.scroll_controller,
 		this.skeleton,
 		this.empty_widget,
 		this.item_extend,
@@ -29,13 +34,14 @@ class ListPaging<T> extends StatefulWidget {
 		this.items_extension,
 		this.allow_refresh = true,
 		this.allow_load_more = true,
-	}) : assert( controller != null ), assert( itemBuilder != null ), super(key: key);
+		this.shrink_wrap = false,
+	}) : assert( controller != null ), assert( itemBuilder != null ), assert( grid_delegate != null ), super(key: key);
 	
 	@override
-	State<StatefulWidget> createState() => _ListPagingState<T>();
+	State<StatefulWidget> createState() => _GridPagingState<T>();
 }
 
-class _ListPagingState<T> extends State<ListPaging<T>> {
+class _GridPagingState<T> extends State<GridPaging<T>> {
 	GlobalKey<EasyRefreshState> _refresh_state = GlobalKey<EasyRefreshState>();
 	@override
 	Widget build(BuildContext context) => new StreamBuilder<List<T>>(
@@ -49,10 +55,12 @@ class _ListPagingState<T> extends State<ListPaging<T>> {
 				loadMore: widget.allow_load_more ? _onLoadMore : null,
 				firstRefresh: true,
 				emptyWidget: widget.empty_widget,
-				firstRefreshWidget: widget.skeleton == null ? null : ListView.builder(
+				firstRefreshWidget: widget.skeleton == null ? null : new GridView.builder(
+					gridDelegate: widget.grid_delegate,
 					itemCount: widget.controller.items_per_page,
-					itemExtent: widget.item_extend,
 					padding: widget.padding,
+					controller: widget.scroll_controller,
+					shrinkWrap: widget.shrink_wrap,
 					itemBuilder: ( final BuildContext context, final int index ) {
 						if ( widget.items_extension != null ) {
 							if ( widget.items_extension.containsKey(index) ) return widget.items_extension[index];
@@ -60,10 +68,12 @@ class _ListPagingState<T> extends State<ListPaging<T>> {
 						} else return widget.skeleton;
 					},
 				),
-				child: ListView.builder(
+				child: new GridView.builder(
+					gridDelegate: widget.grid_delegate,
 					itemCount: snapshot.hasData ? ( snapshot.data.length + ( widget.items_extension  != null ? widget.items_extension.length : 0 ) ) : ( widget.items_extension  != null ? widget.items_extension.length : 0 ),
 					padding: widget.padding,
-					itemExtent: widget.item_extend,
+					controller: widget.scroll_controller,
+					shrinkWrap: widget.shrink_wrap,
 					itemBuilder: ( final BuildContext context, final int index ) {
 						if ( widget.items_extension != null ) {
 							if ( widget.items_extension.containsKey(index) ) {
@@ -95,7 +105,7 @@ class _ListPagingState<T> extends State<ListPaging<T>> {
 	}
 	
 	@override
-	void didUpdateWidget(ListPaging<T> oldWidget) {
+	void didUpdateWidget( GridPaging<T> oldWidget ) {
 		super.didUpdateWidget(oldWidget);
 		if ( widget.controller != oldWidget.controller ) {
 			new Future.delayed(Duration.zero, () {
