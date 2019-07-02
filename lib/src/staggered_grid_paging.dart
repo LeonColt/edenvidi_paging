@@ -5,7 +5,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'definitions.dart';
 import 'paging_controller.dart';
 
-class GraphQLStaggeredGridPaging<T> extends StatefulWidget {
+class StaggeredGridPaging<T> extends StatefulWidget {
 	final int cross_axis_count;
 	final ItemBuilder<T> itemBuilder;
 	final PagingController<T> controller;
@@ -14,7 +14,7 @@ class GraphQLStaggeredGridPaging<T> extends StatefulWidget {
 	final Widget empty_widget;
 	final ScrollController outer_scroll_controller;
 	final OnError onError;
-	const GraphQLStaggeredGridPaging({
+	const StaggeredGridPaging({
 		Key key,
 		@required this.controller,
 		@required this.itemBuilder,
@@ -31,10 +31,10 @@ class GraphQLStaggeredGridPaging<T> extends StatefulWidget {
 				super(key: key);
 	
 	@override
-	State<StatefulWidget> createState() => _GraphQLStaggeredGridPagingState<T>();
+	State<StatefulWidget> createState() => _StaggeredGridPagingState<T>();
 }
 
-class _GraphQLStaggeredGridPagingState<T> extends State<GraphQLStaggeredGridPaging<T>> {
+class _StaggeredGridPagingState<T> extends State<StaggeredGridPaging<T>> {
 	final GlobalKey<EasyRefreshState> _refresh_state = GlobalKey<EasyRefreshState>();
 	@override
 	Widget build(BuildContext context) => new StreamBuilder<List<T>>(
