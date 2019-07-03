@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -7,22 +8,17 @@ import 'page_info.dart';
 import 'paging_controller.dart';
 
 class GraphQLPagingController<T> extends PagingController<T> {
-	final String alias;
-	final int items_per_page;
 	final QueryOptions query_options;
 	final Transformer<T>transformer;
 	final BehaviorSubject<Map<int, List<T>>> _paging_subject = new BehaviorSubject.seeded(const {});
-	GraphQLClient client;
+	GraphQLClient _client;
 	
 	GraphQLPagingController( {
-		@required this.client,
-		@required this.alias,
+		@required final BuildContext context,
 		@required this.transformer,
 		@required this.query_options,
-		@required this.items_per_page,
-	}): assert( alias != null ),
-				assert( client != null ),
-				assert( transformer != null ) {
+		@required final int items_per_page,
+	}): assert( context != null ), assert( transformer != null ), super( items_per_page: items_per_page ) {
 		_paging_subject.listen( ( final Map<int, List<T>> data )  {
 			final List<T> list = new List();
 			for ( int i = 1; i <= page; ++i ) {
@@ -30,6 +26,7 @@ class GraphQLPagingController<T> extends PagingController<T> {
 			}
 			item_subject.add(list);
 		});
+		new Future.delayed(Duration.zero, () => _client = GraphQLProvider.of(context).value );
 	}
 	
 	@override
@@ -37,7 +34,7 @@ class GraphQLPagingController<T> extends PagingController<T> {
 		if ( query_options == null ) return;
 		final completer = await lock();
 		try {
-			final QueryResult result = await client.query(_getNextOptions());
+			final QueryResult result = await _client.query(_getNextOptions());
 			
 			if ( result.hasErrors ) {
 				throw new Exception( result.errors.map( ( final error ) => error.toString() ).join("\r\n"), );
@@ -70,7 +67,7 @@ class GraphQLPagingController<T> extends PagingController<T> {
 		try {
 			page = 1;
 			
-			final QueryResult result = await client.query(_getNextOptions());
+			final QueryResult result = await _client.query(_getNextOptions());
 			
 			if ( result.hasErrors ) {
 				throw new Exception( result.errors.map( ( final error ) => error.toString() ).join("\r\n"), );
