@@ -5,13 +5,13 @@ import 'paging_controller.dart';
 mixin Paging<C extends StatefulWidget, T> on State<C> {
 	PagingController<T> _paging_controller;
 	
-	Widget getChild( final BuildContext context, AsyncSnapshot<List<T>> snapshot );
+	Widget getChild( final BuildContext context, List<T> list );
 	
 	@mustCallSuper
 	@override
 	Widget build(BuildContext context) => new StreamBuilder<List<T>>(
 		stream: _paging_controller?.itemStream,
-		builder: getChild,
+		builder: ( final BuildContext context, final snapshot ) => getChild( context, snapshot.hasData ? snapshot.data : const [] ),
 	);
 	
 	@protected
@@ -49,4 +49,16 @@ mixin Paging<C extends StatefulWidget, T> on State<C> {
 	
 	@protected
 	void onError( dynamic error, StackTrace stack_trace );
+	
+	@mustCallSuper
+	void updatePagingController() {
+		if ( mounted ) {
+			setState(() {
+				_paging_controller = getPagingController();
+			});
+			new Future.delayed(Duration.zero, onPagingControllerUpdate);
+		}
+	}
+	
+	void onPagingControllerUpdate(){}
 }
