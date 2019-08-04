@@ -13,7 +13,7 @@ abstract class PagingController<T> {
 	
 	@protected int max_page = 1;
 	
-	@protected Future<Null> _lock_items = null;
+	@protected Future<Null> _lock_items;
 	
 	PagingController({ @required this.items_per_page }) : assert( items_per_page != null ), assert( items_per_page > 0 );
 	
@@ -39,7 +39,6 @@ abstract class PagingController<T> {
 	
 	void removeWhere( bool test( T element ) );
 	
-	@protected
 	@mustCallSuper
 	void dispose() {
 		item_subject.close();
